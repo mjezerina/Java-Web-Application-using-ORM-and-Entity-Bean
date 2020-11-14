@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>M. Jezerinac - Zadaća br. 3</title>
+        <style type="text/css">
+            .skrivena{
+                visibility: hidden;
+            }
+            .otkrivena{
+                visibility: visible;
+            }
+        </style>
+
+        <script>
+            function pripremi() {
+                $("#tablica").addClass("skrivena");
+                $("#tablica2").addClass("skrivena");
+            }
+            function otkrivanjePrveTablice() {
+                $("#tablica").removeClass("skrivena");
+                $("#tablica").addClass("otkrivena");
+            }
+            function otkrivanjeDrugeTablice() {
+                $("#tablica2").removeClass("skrivena");
+                $("#tablica2").addClass("otkrivena");
+            }
+        </script>
+    </h:head>
+    <h:body onload="pripremi()">
+        <h:form>
+            <h:selectOneListbox id="selectbox" value="#{prikazKorisnika.odabraniKorisnik}" size="10">
+                <f:selectItem itemLabel="Odaberi korisnika" itemValue="" itemDisabled="true"/>
+                <f:selectItems value="#{prikazKorisnika.korisnici}" var="k" itemLabel="#{k.ime} #{k.prezime} (#{prikazKorisnika.dohvatiBrojAerodroma(k.korIme)}) " 
+                               itemValue="#{k.korIme}"/>
+            </h:selectOneListbox>
+            <h:commandButton value="Prikaži korisnikove avione"  action="#{prikazKorisnika.napuniListuAerodromaKorisnika()}">
+                <f:ajax onevent="otkrivanjePrveTablice" event="click" execute="selectbox" render="tablica"/>
+            </h:commandButton>   
+        </h:form>
+
+        <h:panelGroup id="tablica">
+            <p:dataTable value="#{prikazKorisnika.listaAerodroma}" var="a" rows="10" 
+                         paginator="true" rowsPerPageTemplate="10,25,50">
+                <p:column>
+                    <f:facet name="header">IDENT</f:facet>#{a.ident}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">NAZIV</f:facet>#{a.name}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">ISOCOUNTRY</f:facet>#{a.isoCountry}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">ISOREGION</f:facet>#{a.isoRegion}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">Broj korisnika koji prate</f:facet>#{prikazKorisnika.dohvatiBrojKorisnikaPrate(a.ident)}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">Broj dana preuzetih letova</f:facet>#{prikazKorisnika.dohvatiBrojDatumaPrati(a.ident)}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">Broj letova s aerodroma</f:facet>#{prikazKorisnika.dohvatiBrojLetovaSAerodroma(a.ident)}
+                </p:column>
+                <p:column>
+                    <p:commandButton value=" Prikaži datume " ajax="true" actionListener="#{prikazKorisnika.napuniListuDohvacenihAerodroma(a.ident)}" update="tablica2 tablica">
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable><br/>
+        </h:panelGroup>
+
+        <h:panelGroup id="tablica2">
+            <p:dataTable value="#{prikazKorisnika.listaDohvacenihAerodroma}" var="b" rows="10" 
+                         paginator="true" rowsPerPageTemplate="10,25,50">
+                <p:column>
+                    <f:facet name="header">DAN PREUZIMANJA</f:facet>#{prikazKorisnika.formatirajFlightDate(b.myairportslogPK.flightdate)}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">VRIJEME PREUZIMANJA</f:facet>#{prikazKorisnika.formatirajStoredDate(b.stored)}
+                </p:column>
+                <p:column>
+                    <p:commandButton value=" Brisanje podataka " ajax="true" actionListener="#{prikazKorisnika.obrisiPodatke(prikazKorisnika.trenutniIdent,b.myairportslogPK.flightdate)}" update="tablica2 tablica">
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable><br/>
+            <h:commandButton value="Vrati na početak" onclick="pripremi()"></h:commandButton>
+        </h:panelGroup>
+    </h:body>
+
+
+</html>
+

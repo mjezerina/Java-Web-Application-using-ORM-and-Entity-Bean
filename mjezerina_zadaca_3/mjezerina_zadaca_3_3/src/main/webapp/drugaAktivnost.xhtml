@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>M. Jezerinac - Zadaća br. 3</title>
+        <style type="text/css">
+            .skrivena{
+                visibility: hidden;
+            }
+            .otkrivena{
+                visibility: visible;
+            }
+        </style>
+        <script>
+            function pripremi() {
+                $("#table2").addClass("skrivena");
+            }
+            function otkrivanjePrveTablice() {
+                $("#table2").removeClass("skrivena");
+                $("#table2").addClass("otkrivena");
+            }
+        </script>
+    </h:head>
+    <h:body onload="pripremi()">
+        <h:outputText id="ukupniBrojAerodroma" value="Ukupni broj aerodroma: "/>
+        <h:form id="table">
+            <p:dataTable value="#{drugaAktivnost.korisnici}" var="a" rows="10" 
+                         paginator="true" rowsPerPageTemplate="10,25,50">
+                <p:column>
+                    <f:facet name="header">IME</f:facet>#{a.ime}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">PREZIME</f:facet>#{a.prezime}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">BROJ AERODROMA:</f:facet>#{drugaAktivnost.dohvatiBrojAerodroma(a.korIme)}
+                </p:column>
+                <p:column>
+                    <p:commandButton onclick="otkrivanjePrveTablice()" value="ODABERI KORISNIKA" action="#{drugaAktivnost.odabirKorisnika(a.korIme)}" update="odabraniKorisnik"></p:commandButton>
+                </p:column>
+            </p:dataTable><br/>
+        </h:form>
+        <h:outputText id="odabraniKorisnik" value="Odabrani korisnik: #{drugaAktivnost.odabraniKorisnik}"/>
+
+        <h:form id="forma2">
+            <h:outputLabel>Filtriranje podataka na temelju naziva:</h:outputLabel>&nbsp;
+            <h:inputText id="unosNaziva" value="#{drugaAktivnost.unosNaziva}"/>&nbsp;
+            <p:watermark for="unosNaziva" value="20.05.2020 13:50" id="watermark" />
+            <p:commandButton onclick="otkrivanjePrveTablice()" value="POTRAŽI JPQL" action="#{drugaAktivnost.napuniListuAerodromaKorisnika(drugaAktivnost.unosNaziva)}" update="table2"></p:commandButton>
+            <p:commandButton onclick="otkrivanjePrveTablice()" value="POTRAŽI CAPI" action="#{drugaAktivnost.napuniListuAerodromaKorisnikaCapi(drugaAktivnost.unosNaziva)}" update="table2"></p:commandButton>
+        </h:form>
+        <h:form id="table2">
+            <p:dataTable value="#{drugaAktivnost.listaAerodroma}" var="b" rows="10" 
+                         paginator="true" rowsPerPageTemplate="10,25,50">
+                <p:column>
+                    <f:facet name="header">IDENT</f:facet>#{b.ident}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">NAZIV</f:facet>#{b.name}
+                </p:column>
+                <p:column>
+                    <f:facet name="header">TRENUTNA TEMPERATURA</f:facet>#{drugaAktivnost.parsirajLatitudu(b.coordinates)}
+                </p:column>
+            </p:dataTable><br/>
+        </h:form>
+    </h:body>
+</html>
+
